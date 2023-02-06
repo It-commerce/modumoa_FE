@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from "styled-components";
 import { set, useForm } from "react-hook-form";
 
@@ -12,47 +12,40 @@ const SignUp = () => {
     const {register, watch, onSubmit, handleSubmit, formState: { errors, isValid }} = useForm();
 
     const [ isAllAgree, setIsAllAgree ] = useState(false);
-    const [ checkedAgrees, setCheckedAgrees ] = useState([0]);
+    const [ checkList, setCheckList ] = useState([]);
+    const [ buttonColor, setButtonColor ] = useState(false);
     
-
-    const TOS_list = [
-        {
-            id : 1,
-            title : "만 14세 이상입니다.",
-            essential : false
-        },
-        {
-            id : 2,
-            title : "이용약관 동의 (필수)",
-            essential : true
-        },
-        {
-            id : 3,
-            title : "개인정보 수집 및 동의 (필수)",
-            essential : true
-        },
-        {
-            id : 4,
-            title : "광고성 정보 수신 동의 (선택)",
-            essential : false
-        },
-    ]
-    function checkId(ele) {
-
-    }
-
-    const isAllAgreeHandler = () => {
-        setIsAllAgree(!isAllAgree)
-    };
-    const singleAgreeHandler = (id) => {
-        console.log("arr",checkedAgrees)
-        checkedAgrees.includes(id) ? 
-
-        setCheckedAgrees(checkedAgrees.filter((data) => data !== id)) : setCheckedAgrees([...checkedAgrees.push(id)])
-        console.log("arr",checkedAgrees)
-
+    
+    const isAllAgreeHandler = (e) => {
+        console.log("ss", e.currentTarget.checked)
+        !e.currentTarget.checked ?
+        setCheckList(["ageCheck", "TOSCheck", "profileCheck", "addCheck"])
+        : setCheckList([]);
     };
 
+    const singleAgreeHandler = (e) => {
+        console.log("arr", e.target.checked)
+        console.log("arr", e.target.id)
+        console.log("color", buttonColor)
+        !e.currentTarget.checked ?
+        setCheckList([...checkList, e.target.id])
+        : setCheckList(checkList.filter((choice) => choice!== e.target.id));
+        console.log("arr22", checkList)
+    };
+
+    useEffect(() => {
+        if (
+            checkList.includes("ageCheck") &&
+            checkList.includes("TOSCheck") &&
+            checkList.includes("profileCheck") &&
+            checkList.includes("addCheck")
+        ) {
+            setButtonColor(true);
+        } else {
+            setButtonColor(false);
+            
+        }
+    }, [checkList])
 
     return (
         <SignUpWrapper>
@@ -119,18 +112,47 @@ const SignUp = () => {
                                 />
                     </InputWrapper>
                     <ErrorMessage>{errors?.nickname?.message}</ErrorMessage>
-                        <AllAgreeWrapper onClick = {() => isAllAgreeHandler()}>
-                            <IsCheckIcon src = {isAllAgree ? checked_btn : unchecked_btn}></IsCheckIcon>
+                        <AllAgreeWrapper 
+                            onClick = {isAllAgreeHandler}
+                            checked = {checkList.length === 4 ? true : false}
+                            >
+                            <IsCheckIcon src = {checkList.length === 4 ? checked_btn : unchecked_btn}></IsCheckIcon>
                             전체동의
                         </AllAgreeWrapper>
 
                         <EctAgreesWrapper>
-                            {TOS_list.map((data, index) => (
-                                <Agrees id = {data.id} essential={data.essential} key={index} onClick={() => singleAgreeHandler(data.id)}>
-                                    <IsCheckIcon src = {false ? checked_btn : unchecked_btn}/>
-                                    {data.title}
+                                <Agrees 
+                                    id = "ageCheck" 
+                                    essential = {false}
+                                    onClick = {singleAgreeHandler}
+                                    checked={checkList.includes("ageCheck") ? true : false}>
+                                    <IsCheckIcon id = "ageCheck" src = {checkList.includes("ageCheck") ? checked_btn : unchecked_btn}/>
+                                    만 14세 이상입니다.
                                 </Agrees>
-                            ))}
+                                <Agrees 
+                                    id = "TOSCheck" 
+                                    essential = {true} 
+                                    onClick={singleAgreeHandler}
+                                    checked={checkList.includes("TOSCheck") ? true : false}>
+                                    <IsCheckIcon id = "TOSCheck" src = {checkList.includes("TOSCheck") ? checked_btn : unchecked_btn}/>
+                                    이용약관 동의(필수)
+                                </Agrees>
+                                <Agrees 
+                                    id = "profileCheck" 
+                                    essential = {true} 
+                                    onClick={singleAgreeHandler} 
+                                    checked={checkList.includes("profileCheck") ? true : false}>
+                                    <IsCheckIcon id = "profileCheck" src = {checkList.includes("profileCheck") ? checked_btn : unchecked_btn}/>
+                                    개인정보 수집 및 동의 (필수)
+                                </Agrees>
+                                <Agrees 
+                                    id = "addCheck" 
+                                    essential = {false} 
+                                    onClick={singleAgreeHandler} 
+                                    checked={checkList.includes("addCheck") ? true : false}>
+                                    <IsCheckIcon id = "addCheck" src = {checkList.includes("addCheck") ? checked_btn : unchecked_btn}/>
+                                    광고성 정보 수신 동의 (선택)
+                                </Agrees>
                         </EctAgreesWrapper>
                     <SignInButton type = "submit">가입하기</SignInButton>
                 </form>

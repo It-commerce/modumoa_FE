@@ -35,7 +35,9 @@ const SignIn = () => {
                             type = "email"
                             placeholder= "이메일을 입력해 주세요."
                             {...register("email", {
-                                required : "아이디(이메일)를 입력해 주세요."
+                                required : "아이디(이메일)를 입력해 주세요.",
+                                minLength: 1,
+                                pattern: /^([0-9a-zA-Z_\.-]+)@([0-9a-zA-Z_-]+)(\.[0-9a-zA-Z_-]+){1,2}$/
                             })}
                         />
                     </InputWrapper>
