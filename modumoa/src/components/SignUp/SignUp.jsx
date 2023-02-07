@@ -4,6 +4,9 @@ import { set, useForm } from "react-hook-form";
 
 import checked_btn from "../../assets/checked_btn.png"
 import unchecked_btn from "../../assets/unchecked_btn.png"
+import pwShow from "../../assets/pw_show.png"
+import pwInvisible from "../../assets/pw_invisible.png"
+
 // import InputForm from './InputForm';
 
 
@@ -11,27 +14,35 @@ const SignUp = () => {
 
     const {register, watch, onSubmit, handleSubmit, formState: { errors, isValid }} = useForm();
 
-    const [ isAllAgree, setIsAllAgree ] = useState(false);
     const [ checkList, setCheckList ] = useState([]);
     const [ buttonColor, setButtonColor ] = useState(false);
-    
-    
+    const [ show, setShow ] = useState(false)
+    const [ pwCheckShow, setPwCheckShow ] = useState(false)
+
+    const showHideHandler = (e) => {
+        if (e.currentTarget.id === "password") {
+            setShow(!show);
+        } else {
+            setPwCheckShow(!pwCheckShow);
+        }
+        
+    }
     const isAllAgreeHandler = (e) => {
-        console.log("ss", e.currentTarget.checked)
         !e.currentTarget.checked ?
         setCheckList(["ageCheck", "TOSCheck", "profileCheck", "addCheck"])
         : setCheckList([]);
     };
 
     const singleAgreeHandler = (e) => {
-        console.log("arr", e.target.checked)
-        console.log("arr", e.target.id)
-        console.log("color", buttonColor)
         !e.currentTarget.checked ?
         setCheckList([...checkList, e.target.id])
         : setCheckList(checkList.filter((choice) => choice!== e.target.id));
-        console.log("arr22", checkList)
     };
+
+    const submitHandler = (errors, isValid) =>  {
+        console.log("에러",errors)
+        console.log("발리드",isValid)
+    }
 
     useEffect(() => {
         if (
@@ -51,7 +62,7 @@ const SignUp = () => {
         <SignUpWrapper>
             <SignUpBox>
                 <PageTitle>회원가입</PageTitle>
-                <form onSubmit={handleSubmit(onSubmit)}>
+                <form onSubmit={handleSubmit(submitHandler)}>
                     <InputWrapper isFirst = {true}>
                                 <label htmlFor="name">이름</label>
                                 <input
@@ -78,26 +89,43 @@ const SignUp = () => {
                     <ErrorMessage>{errors?.email?.message}</ErrorMessage>
                     <InputWrapper isFirst = {false}>
                                 <label htmlFor="password">비밀번호</label>
-                                <input
-                                    id = "password"
-                                    type = "password" // 비밀번호 보여주기 눈알 할건지?
-                                    placeholder= "사용할 비밀번호를 입력해 주세요."
-                                    {...register("password", {
-                                        required : "비밀번호를 입력해 주세요."
-                                    })}
-                                />
+                                <IconInputWrapper>
+                                    <input
+                                        id = "password"
+                                        type = {show ? "text" : "password" }
+                                        style={{border : "0px"}}
+                                        placeholder= "사용할 비밀번호를 입력해 주세요."
+                                        {...register("password", {
+                                            required : "비밀번호를 입력해 주세요.",
+                                            minLength: {
+                                                value: 3,
+                                                message: '3글자 이상 입력해주세요.',
+                                            },
+                                            pattern: { 
+                                            value: /^[A-za-z0-9가-힣]{3,10}$/,
+                                            message: '가능한 문자: 영문 대소문자, 글자 단위 한글, 숫자', // 에러 메세지
+                                            },
+                                        })}  
+                                    />
+                                    <Icon id = "password" onClick={showHideHandler} src = {show ? pwShow : pwInvisible}/>
+                                </IconInputWrapper>
                     </InputWrapper>
                     <ErrorMessage>{errors?.password?.message}</ErrorMessage>
                     <InputWrapper isFirst = {false}>
                                 <label htmlFor="passwordCheck">비밀번호 재입력</label>
-                                <input
+                                <IconInputWrapper>
+                                    <input
                                     id = "passwordCheck"
-                                    type = "password"
+                                    type = {pwCheckShow ? "text" : "password" }
+                                    style={{border : "0px"}}
                                     placeholder= "사용할 비밀번호를 다시 입력해 주세요."
                                     {...register("passwordCheck", {
                                         required : "비밀번호를 입력해 주세요."
                                     })}
-                                />
+                                    />
+                                    <Icon id = "passwordCheck" onClick={showHideHandler} src = {pwCheckShow ? pwShow : pwInvisible}/>
+                                </IconInputWrapper>
+                                
                     </InputWrapper>
                     <ErrorMessage>{errors?.passwordCheck?.message}</ErrorMessage>
                     <InputWrapper isFirst = {false}>
@@ -197,8 +225,10 @@ const InputWrapper = styled.div`
         color : #666666;
         margin-bottom : 8px;
         font-weight: 500;
+        position : relative;
     }
     input {
+        position : relative;
         border: 1px solid #E6E6E6;
         border-radius: 6px;
 
@@ -210,6 +240,8 @@ const InputWrapper = styled.div`
         font-size: 16px;
         line-height: 19px;
         color : #C1C1C1;
+        background-image: url(${(props) => (props.type === "password" ? pwShow : "")})
+        background-repeat: no-repeat
     }
     input::placeholder {
         color : #C1C1C1;
@@ -299,4 +331,26 @@ const EctAgreesWrapper = styled.div`
 `
 const Agrees = styled.div`
     margin-bottom : 18px;
+`
+
+const Icon = styled.img` 
+    margin-right : 12px;
+    width : 20px;
+    height : 15.43px;
+`
+const IconInputWrapper = styled.div`
+    display : flex;
+    flex-direction : row;
+    border: 1px solid #E6E6E6;
+    border-radius: 6px;
+    align-items: center;
+    :hover {
+        border: 1px solid #23E2BD;
+        color: #585858;
+        font-weight: 600;
+    }
+    :focus { 
+        outline: none;
+        color : #C1C1C1;
+    }
 `

@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from "styled-components";
 import { useForm } from "react-hook-form";
 
 import SocialLogIn from '../SocialLogIn/SocialLogIn';
 import HeaderFrame from '../Common/Header/HeaderFrame';
 import logo from '../../assets/Logo.png'
+import pwShow from "../../assets/pw_show.png"
+import pwInvisible from "../../assets/pw_invisible.png"
 
 
 
@@ -13,14 +15,12 @@ import logo from '../../assets/Logo.png'
 const SignIn = () => {
 
     const { register, watch, onSubmit, handleSubmit, formState: { errors, isValid }} = useForm();
-    console.log("valid", isValid);
-    const exHandler = () => {
-        
-        console.log("errors", errors);
-    }
+    
+    const [ show, setShow ] = useState(false);
 
-    // const Tab = ["아이디 찾기", "비밀번호 찾기", "회원가입"]
-    // const Tabs = `${Tab.map((props) => (props === "아이디 찾기" ? <Tab onClilck={func} >props</Tab> : <Tab onClilck={func}>{" | " + props}</Tab>)).join('')}`
+    const pwShowHandler = () => {
+        setShow(!show);
+    }
 
     return (
         <SignInWrapper>
@@ -44,17 +44,21 @@ const SignIn = () => {
                     <ErrorMessage>{errors?.email?.message}</ErrorMessage>
                     <InputWrapper isEmail = {false}>
                         <label htmlFor="password">비밀번호</label>
-                        <input
-                            id = "password"
-                            type = "password"
-                            placeholder= "비밀번호를 입력해 주세요."
-                            {...register("password", {
-                                required : "비밀번호를 입력해 주세요."
-                            })}
-                            />
+                        <PwInputWrapper>
+                            <input
+                                id = "password"
+                                type = {show ? "text" : "password"}
+                                style = {{border : "0px"}}
+                                placeholder= "비밀번호를 입력해 주세요."
+                                {...register("password", {
+                                    required : "비밀번호를 입력해 주세요."
+                                })}
+                                />
+                            <Icon onClick={pwShowHandler} src = {show ? pwShow : pwInvisible} />
+                        </PwInputWrapper>
                     </InputWrapper>
                     <ErrorMessage>{errors?.password?.message}</ErrorMessage>
-                    <SignInButton type = "submit" disabled= {!isValid} onClick = {exHandler}>로그인</SignInButton>
+                    <SignInButton type = "submit" disabled= {!isValid} onClick>로그인</SignInButton>
                     <TabWrapper>
                         <div className='tab'>아이디 찾기</div> | <div className='tab'>비밀번호 찾기</div> | <div className='tab'>회원가입</div>
                     </TabWrapper>
@@ -215,5 +219,23 @@ const OAuth = styled.div`
     dispaly : flex;
     flex-direction : row;
     margin-top : 24px;
-    
+`
+
+const PwInputWrapper = styled.div`
+    display : flex;
+    flex-direction : row;
+    align-items : center;
+    border: 1px solid #E6E6E6;
+    border-radius: 6px;
+    :hover {
+        border: 1px solid #23E2BD;
+        color: #585858;
+        font-weight: 600;
+    }
+`
+
+const Icon = styled.img`
+    margin-right : 12px;
+    width : 20px;
+    height : 15.43px;
 `
